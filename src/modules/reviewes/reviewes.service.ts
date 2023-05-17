@@ -11,7 +11,7 @@ import { Review } from './review.model';
 export class ReviewesService {
   private collection: Collection<Omit<Review, 'user' | 'id'>>;
   constructor(@Inject('DATABASE_CONNECTION') db: Db, private restaurantsService: RestaurantsService) {
-    this.collection = db.collection('restaurants');
+    this.collection = db.collection('reviews');
   }
 
   async createReview(user: UserAuth, input: CreateReviewInput) {

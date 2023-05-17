@@ -17,6 +17,10 @@ import { MongoClient, Db } from 'mongodb';
           await db
             .collection('users')
             .createIndex({ email: 1 }, { unique: true });
+          await db
+            .collection('restaurants')
+            .createIndex({ location: "2dsphere" });
+
 
           return db;
         } catch (e) {
@@ -28,4 +32,4 @@ import { MongoClient, Db } from 'mongodb';
   ],
   exports: ['DATABASE_CONNECTION'],
 })
-export class DbModule {}
+export class DbModule { }
