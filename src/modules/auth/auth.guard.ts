@@ -1,16 +1,17 @@
 import {
   CanActivate,
   ExecutionContext,
+  ForbiddenException,
   Injectable,
-  UnauthorizedException,
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { GqlExecutionContext } from '@nestjs/graphql';
 import { JwtService } from '@nestjs/jwt';
+import { Role } from '../users/user.model';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
-  constructor(private jwtService: JwtService, private reflector: Reflector) { }
+  constructor(private jwtService: JwtService, private reflector: Reflector) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const ctx = GqlExecutionContext.create(context);
@@ -19,16 +20,31 @@ export class AuthGuard implements CanActivate {
       return true;
     }
     const token = c.req.headers?.authorization?.split(' ')[1];
+
     if (!token) {
-      return false;
+      throw new ForbiddenException('invalid token');
     }
+    const payload = this.validateToken(token);
+    c.req.user = payload;
+    if (this.getMinRole(ctx) > payload.role) {
+      throw new ForbiddenException('permission denied');
+    }
+    return true;
+  }
+  validateToken(token: string) {
     try {
-      const payload = this.jwtService.verify(token);
-      c.req.userId = payload.userId;
-      return true;
+      return this.jwtService.verify(token);
     } catch {
-      return false;
+      throw new ForbiddenException('invalid token');
     }
+  }
+  getMinRole(ctx: ExecutionContext) {
+    return (
+      this.reflector.getAllAndOverride('MIN_ROLE', [
+        ctx.getHandler(),
+        ctx.getClass(),
+      ]) || Role.user
+    );
   }
   isOptional(ctx: ExecutionContext) {
     return this.reflector.getAllAndOverride('IS_OPTIONAL_AUTH', [

@@ -1,5 +1,5 @@
-import { BadRequestException } from "@nestjs/common";
-import { ObjectId } from "mongodb";
+import { BadRequestException } from '@nestjs/common';
+import { ObjectId } from 'mongodb';
 
 export function objectIdOrThrow(id: string) {
   if (!ObjectId.isValid(id)) {

@@ -9,6 +9,7 @@ import { UsersModule } from './modules/users/users.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { ConfigModule } from '@nestjs/config';
 import { DbModule } from './modules/db/db.module';
+import { RestaurantsModule } from './modules/restaurants/restaurants.module';
 
 @Module({
   imports: [
@@ -22,8 +23,9 @@ import { DbModule } from './modules/db/db.module';
     UsersModule,
     AuthModule,
     DbModule,
+    RestaurantsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule { }
+export class AppModule {}

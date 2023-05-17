@@ -5,6 +5,7 @@
 type User {
   id: ID!
   name: String!
+  role: Float!
 }
 
 type AuthPayload {
@@ -12,13 +13,77 @@ type AuthPayload {
   token: String!
 }
 
+type Contact {
+  email: String
+  phone: String
+}
+
+type OpeningHour {
+  day: Weekday!
+  hours: String!
+}
+
+enum Weekday {
+  Monday
+  Tuesday
+  Wednesday
+  Thursday
+  Friday
+  Saturday
+  Sunday
+}
+
+type Location {
+  longitude: Float!
+  latitude: Float!
+}
+
+type Restaurant {
+  id: ID!
+  name: String!
+  location: Location!
+  address: String!
+  distance(location: LocationInput!): Int!
+  rating: Float!
+  cuisine: String!
+  contact: Contact
+  openingHours: [OpeningHour!]
+}
+
+input LocationInput {
+  longitude: Float!
+  latitude: Float!
+}
+
 type Query {
   user: User!
+  restaurants(query: SearchRestaurantsInput!): [Restaurant!]!
+  restaurant(id: ID!): Restaurant!
+}
+
+input SearchRestaurantsInput {
+  limit: Int! = 16
+  skip: Int! = 0
+  nearBy: NearByInput
+  name: String
+  cuisine: String
+  city: String
+  minPrice: Float
+  maxPrice: Float
+}
+
+input NearByInput {
+  radius: Float!
+  longitude: Float!
+  latitude: Float!
 }
 
 type Mutation {
   register(input: RegisterUserInput!): AuthPayload!
   login(input: LoginUserInput!): AuthPayload!
+  createRestaurant(input: CreateRestaurantInput!): Restaurant!
+  updateRestaurant(input: UpdateRestaurantInput!): Restaurant!
+  deleteRestaurant(id: String!): Boolean!
 }
 
 input RegisterUserInput {
@@ -30,4 +95,35 @@ input RegisterUserInput {
 input LoginUserInput {
   email: String!
   password: String!
+}
+
+input CreateRestaurantInput {
+  name: String!
+  location: LocationInput!
+  address: String!
+  rating: Float!
+  cuisine: String!
+  contact: ContactInput
+  openingHours: [OpeningHourInput!]
+}
+
+input ContactInput {
+  email: String
+  phone: String
+}
+
+input OpeningHourInput {
+  day: Weekday!
+  hours: String!
+}
+
+input UpdateRestaurantInput {
+  name: String
+  location: LocationInput
+  address: String
+  rating: Float
+  cuisine: String
+  contact: ContactInput
+  openingHours: [OpeningHourInput!]
+  id: ID!
 }

@@ -3,8 +3,14 @@ import * as argon2 from 'argon2';
 import { Collection, Db } from 'mongodb';
 import { mapOID, mapOIDIfNotNull, objectIdOrThrow } from 'src/utils';
 import { RegisterUserInput } from './dto/register.input';
-import { DbUser } from './user.db-model';
-import { User } from './user.model';
+import { Role, User } from './user.model';
+
+interface DbUser {
+  name: string;
+  email: string;
+  password: string;
+  role: Role;
+}
 
 @Injectable()
 export class UsersService {
@@ -31,14 +37,11 @@ export class UsersService {
     const user = await this.createUser({
       ...input,
       password: hashedPassword,
+      role: Role.user,
     });
     return mapOID(user);
   }
-  private async createUser(insertInput: {
-    password: string;
-    email: string;
-    name: string;
-  }) {
+  private async createUser(insertInput: DbUser) {
     const { insertedId } = await this.collection.insertOne(insertInput);
     const user = { _id: insertedId, ...insertInput };
     return user;

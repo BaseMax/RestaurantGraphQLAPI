@@ -3,8 +3,8 @@ import { DbModule } from '../db/db.module';
 import { UsersService } from './users.service';
 
 @Module({
-  imports:[DbModule],
+  imports: [DbModule],
   providers: [UsersService],
   exports: [UsersService],
 })
-export class UsersModule { }
+export class UsersModule {}

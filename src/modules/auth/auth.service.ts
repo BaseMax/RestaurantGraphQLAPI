@@ -8,7 +8,7 @@ import { User } from '../users/user.model';
 
 @Injectable()
 export class AuthService {
-  constructor(private usersService: UsersService, private jwt: JwtService) { }
+  constructor(private usersService: UsersService, private jwt: JwtService) {}
   async register(input: RegisterUserInput) {
     const user = await this.usersService.register(input);
     const token = this.getToken(user);
@@ -30,8 +30,8 @@ export class AuthService {
   }
   getToken(user: User) {
     const token = this.jwt.sign({
-      email: user.email,
-      userId: user.id,
+      id: user.id,
+      role: user.role,
     });
     return token;
   }

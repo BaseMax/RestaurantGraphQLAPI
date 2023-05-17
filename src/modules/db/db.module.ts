@@ -28,4 +28,4 @@ import { MongoClient, Db } from 'mongodb';
   ],
   exports: ['DATABASE_CONNECTION'],
 })
-export class DbModule { }
+export class DbModule {}
