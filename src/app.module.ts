@@ -10,6 +10,7 @@ import { AuthModule } from './modules/auth/auth.module';
 import { ConfigModule } from '@nestjs/config';
 import { DbModule } from './modules/db/db.module';
 import { RestaurantsModule } from './modules/restaurants/restaurants.module';
+import { FoodsModule } from './modules/foods/foods.module';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { RestaurantsModule } from './modules/restaurants/restaurants.module';
     AuthModule,
     DbModule,
     RestaurantsModule,
+    FoodsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

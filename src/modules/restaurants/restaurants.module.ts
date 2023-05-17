@@ -5,6 +5,7 @@ import { DbModule } from '../db/db.module';
 
 @Module({
   providers: [RestaurantsService, RestaurantsResolver],
+  exports: [RestaurantsService],
   imports: [DbModule],
 })
-export class RestaurantsModule {}
+export class RestaurantsModule { }

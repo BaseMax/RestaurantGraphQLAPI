@@ -1,24 +1,17 @@
-import {
-  ForbiddenException,
-  Inject,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
-import { getDistance } from 'geolib';
+import { ForbiddenException, Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { Collection, Db } from 'mongodb';
 import { mapOID, objectIdOrThrow } from 'src/utils';
+import { Pagination } from 'src/utils/pagination.input';
 import { UserAuth } from '../auth/user-data.decorator';
+import { Restaurant } from '../restaurants/restaurant.model';
+import { RestaurantsService } from '../restaurants/restaurants.service';
 import { Role } from '../users/user.model';
-import {
-  CreateRestaurantInput,
-  LocationInput,
-} from './dto/create-restaurant.input';
-import { SearchRestaurantsInput } from './dto/search.input';
-import { UpdateRestaurantInput } from './dto/update-restaurant.input';
-import { Restaurant } from './restaurant.model';
+import { CreateFoodInput } from './dto/create-food.input';
+import { UpdateFoodInput } from './dto/update-food.input';
+import { Food } from './foods.model';
 
 @Injectable()
-export class RestaurantsService {
+export class FoodsService {
   async findById(id: string) {
     const doc = await this.collection.findOne({ _id: objectIdOrThrow(id) });
     if (!doc) throw new NotFoundException('restaurant not found');
@@ -28,9 +21,9 @@ export class RestaurantsService {
     await this.findAndValidatePermissions(id, user);
     await this.collection.deleteOne({ _id: objectIdOrThrow(id) });
   }
-  private collection: Collection<Omit<Restaurant, 'distance' | 'id'>>;
-  constructor(@Inject('DATABASE_CONNECTION') db: Db) {
-    this.collection = db.collection('restaurants');
+  private collection: Collection<Omit<Food, 'id'>>;
+  constructor(@Inject('DATABASE_CONNECTION') db: Db, private restaurantsService: RestaurantsService) {
+    this.collection = db.collection('foods');
   }
   private async findAndValidatePermissions(
     id: string,
@@ -42,14 +35,16 @@ export class RestaurantsService {
     }
   }
 
-  async search(input: SearchRestaurantsInput) {}
-  async create(user: UserAuth, input: CreateRestaurantInput) {
+  async create(user: UserAuth, input: CreateFoodInput) {
+    if (!this.restaurantsService.findById(input.restaurantId)) {
+      throw new NotFoundException("restaurant not found");
+    }
     const insertData = { ...input, creatorId: user.id };
     const { insertedId } = await this.collection.insertOne(insertData);
     const output = { ...insertData, _id: insertedId };
     return mapOID(output);
   }
-  async update(user: UserAuth, input: UpdateRestaurantInput) {
+  async update(user: UserAuth, input: UpdateFoodInput) {
     const { id, ...data } = input;
     await this.findAndValidatePermissions(id, user);
     const { value } = await this.collection.findOneAndUpdate(
@@ -64,11 +59,14 @@ export class RestaurantsService {
 
     return mapOID(value!);
   }
-
-  calculateDistance(
-    restaurant: Omit<Restaurant, 'distance'>,
-    location: LocationInput,
-  ) {
-    return getDistance(restaurant.location, location);
+  restaurantsFoods(restaurantId: string, pagination: Pagination) {
+    const foods = this.collection.find({
+      restaurantId: restaurantId
+    }, {
+      ...pagination
+    }).toArray().then(e => e.map(mapOID))
+    return foods;
   }
+
+
 }

@@ -55,10 +55,19 @@ input LocationInput {
   latitude: Float!
 }
 
+type Food {
+  id: ID!
+  name: String!
+  description: String!
+  price: Float!
+}
+
 type Query {
   user: User!
   restaurants(query: SearchRestaurantsInput!): [Restaurant!]!
   restaurant(id: ID!): Restaurant!
+  food(id: ID!): Food!
+  foods(restaurantId: ID!, pagination: Pagination!): [Food!]!
 }
 
 input SearchRestaurantsInput {
@@ -78,12 +87,20 @@ input NearByInput {
   latitude: Float!
 }
 
+input Pagination {
+  limit: Int! = 16
+  skip: Int! = 0
+}
+
 type Mutation {
   register(input: RegisterUserInput!): AuthPayload!
   login(input: LoginUserInput!): AuthPayload!
   createRestaurant(input: CreateRestaurantInput!): Restaurant!
   updateRestaurant(input: UpdateRestaurantInput!): Restaurant!
   deleteRestaurant(id: String!): Boolean!
+  createFood(input: CreateFoodInput!): Food!
+  updateFood(input: UpdateFoodInput!): Food!
+  deleteFood(id: String!): Boolean!
 }
 
 input RegisterUserInput {
@@ -125,5 +142,20 @@ input UpdateRestaurantInput {
   cuisine: String
   contact: ContactInput
   openingHours: [OpeningHourInput!]
+  id: ID!
+}
+
+input CreateFoodInput {
+  name: String!
+  description: String!
+  price: Float!
+  restaurantId: ID!
+}
+
+input UpdateFoodInput {
+  name: String
+  description: String
+  price: Float
+  restaurantId: ID
   id: ID!
 }
