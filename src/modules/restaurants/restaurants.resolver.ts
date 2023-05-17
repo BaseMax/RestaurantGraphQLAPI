@@ -31,7 +31,7 @@ export class RestaurantsResolver {
   }
   @Query(() => Restaurant)
   async restaurant(@Args('id', { type: () => ID }) id: string) {
-    return await this.service.findById(id);
+    return await this.service.findByIdOrThrow(id);
   }
 
   @MinRole(Role.admin)

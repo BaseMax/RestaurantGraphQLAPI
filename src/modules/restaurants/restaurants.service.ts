@@ -19,7 +19,7 @@ import { Restaurant } from './restaurant.model';
 
 @Injectable()
 export class RestaurantsService {
-  async findById(id: string) {
+  async findByIdOrThrow(id: string) {
     const doc = await this.collection.findOne({ _id: objectIdOrThrow(id) });
     if (!doc) throw new NotFoundException('restaurant not found');
     return mapOID(doc);
@@ -36,7 +36,7 @@ export class RestaurantsService {
     id: string,
     user: UserAuth,
   ) {
-    const doc = await this.findById(id);
+    const doc = await this.findByIdOrThrow(id);
     if (user.role < Role.superadmin && user.id !== doc.creatorId) {
       throw new ForbiddenException('could not modify');
     }

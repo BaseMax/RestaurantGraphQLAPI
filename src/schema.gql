@@ -62,12 +62,20 @@ type Food {
   price: Float!
 }
 
+type Review {
+  id: ID!
+  rating: Float!
+  comment: String!
+  user: User!
+}
+
 type Query {
   user: User!
   restaurants(query: SearchRestaurantsInput!): [Restaurant!]!
   restaurant(id: ID!): Restaurant!
   food(id: ID!): Food!
   foods(restaurantId: ID!, pagination: Pagination!): [Food!]!
+  reviews(restaurantId: ID!, pagination: Pagination!): [Review!]!
 }
 
 input SearchRestaurantsInput {
@@ -101,6 +109,7 @@ type Mutation {
   createFood(input: CreateFoodInput!): Food!
   updateFood(input: UpdateFoodInput!): Food!
   deleteFood(id: String!): Boolean!
+  createReview(input: CreateReviewInput!): Review!
 }
 
 input RegisterUserInput {
@@ -158,4 +167,10 @@ input UpdateFoodInput {
   price: Float
   restaurantId: ID
   id: ID!
+}
+
+input CreateReviewInput {
+  restaurantId: ID!
+  comment: String!
+  rating: Int!
 }

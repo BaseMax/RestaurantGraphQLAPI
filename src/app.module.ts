@@ -11,6 +11,7 @@ import { ConfigModule } from '@nestjs/config';
 import { DbModule } from './modules/db/db.module';
 import { RestaurantsModule } from './modules/restaurants/restaurants.module';
 import { FoodsModule } from './modules/foods/foods.module';
+import { ReviewesModule } from './modules/reviewes/reviewes.module';
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { FoodsModule } from './modules/foods/foods.module';
     DbModule,
     RestaurantsModule,
     FoodsModule,
+    ReviewesModule,
   ],
   controllers: [AppController],
   providers: [AppService],

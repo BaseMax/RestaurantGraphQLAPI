@@ -23,6 +23,7 @@ export class UsersService {
       .findOne({ _id: objectIdOrThrow(id) })
       .then(mapOIDIfNotNull);
   }
+  
   getUserByEmail(email: string): Promise<User | null> {
     return this.collection.findOne({ email: email }).then(mapOIDIfNotNull);
   }

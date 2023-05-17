@@ -36,7 +36,7 @@ export class FoodsService {
   }
 
   async create(user: UserAuth, input: CreateFoodInput) {
-    if (!this.restaurantsService.findById(input.restaurantId)) {
+    if (!this.restaurantsService.findByIdOrThrow(input.restaurantId)) {
       throw new NotFoundException("restaurant not found");
     }
     const insertData = { ...input, creatorId: user.id };
@@ -59,13 +59,13 @@ export class FoodsService {
 
     return mapOID(value!);
   }
-  restaurantsFoods(restaurantId: string, pagination: Pagination) {
-    const foods = this.collection.find({
-      restaurantId: restaurantId
-    }, {
-      ...pagination
-    }).toArray().then(e => e.map(mapOID))
-    return foods;
+  async restaurantsFoods(restaurantId: string, pagination: Pagination) {
+    await this.restaurantsService.findByIdOrThrow(restaurantId)
+    return (
+      this.collection.find({ restaurantId }, pagination)
+        .toArray()
+        .then(e => e.map(mapOID))
+    )
   }
 
 
