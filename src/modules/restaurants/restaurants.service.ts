@@ -121,6 +121,7 @@ export class RestaurantsService {
       $limit: input.limit,
     })
 
+    console.log(JSON.stringify(pipeline))
 
     const data = await this.collection.aggregate(pipeline).toArray().then((e: any[]) => e.map(this.mapDocumentFromGeoJson).map(mapOID))
     return data;
