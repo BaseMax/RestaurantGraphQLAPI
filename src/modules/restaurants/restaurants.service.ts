@@ -47,7 +47,84 @@ export class RestaurantsService {
     }
   }
 
-  async search(input: SearchRestaurantsInput) { }
+  async search(input: SearchRestaurantsInput) {
+    const query: any = {}
+    const pipeline: any[] = []
+    if (input.name) {
+      query.name = { $regex: new RegExp(input.name, 'i') };
+    }
+
+    if (input.cuisine) {
+      query.cuisine = { $regex: new RegExp(input.cuisine, 'i') };
+    }
+
+    if (input.city) {
+      query.address = { $regex: new RegExp(input.city, 'i') };
+    }
+
+    if (input.nearBy) {
+      pipeline.unshift({
+        $geoNear: {
+          near: { type: 'Point', coordinates: [input.nearBy.longitude, input.nearBy.latitude] },
+          distanceField: 'string',
+          maxDistance: input.nearBy.radius,
+          query: query,
+          spherical: true
+        }
+      })
+    } else {
+      pipeline.unshift({
+        $match: query
+      });
+    }
+    if (input.minPrice || input.maxPrice) {
+      pipeline.push({
+        $lookup: {
+          from: 'foods',
+          let: {
+            id: { $toString: '$_id' }
+          },
+          pipeline: [{
+            $match: {
+              $expr: {
+                $eq: ['$restaurantId', "$$id"]
+              }
+            }
+          }, {
+            $group: {
+              _id: null,
+              maxPrice: { $max: '$price' },
+              minPrice: { $min: '$price' }
+
+            }
+
+          }],
+          as: 'foods'
+        }
+      })
+      pipeline.push({
+        $addFields: {
+          maxPrice: { $arrayElemAt: ['$foods.maxPrice', 0] },
+          minPrice: { $arrayElemAt: ['$foods.minPrice', 0] }
+        }
+      });
+      pipeline.push({
+        $match: {
+          $and: [...input.maxPrice ? [{ maxPrice: { $lte: input.maxPrice } }] : [], ...input.minPrice ? [{ minPrice: { $gte: input.minPrice } }] : []]
+        }
+      })
+    }
+    pipeline.push({
+      $skip: input.skip,
+    })
+    pipeline.push({
+      $limit: input.limit,
+    })
+
+
+    const data = await this.collection.aggregate(pipeline).toArray().then((e: any[]) => e.map(this.mapDocumentFromGeoJson).map(mapOID))
+    return data;
+  }
   async create(user: UserAuth, input: CreateRestaurantInput) {
     const insertData = this.mapDocumentIntoGeoJson({ ...input, creatorId: user.id });
     const { insertedId } = await this.collection.insertOne(insertData);
@@ -72,23 +149,23 @@ export class RestaurantsService {
   mapDocumentIntoGeoJson<T extends { location: Location }>(restaurant: T) {
     return {
       ...restaurant,
-      location: this.toGeoJson(restaurant.location)
+      location: RestaurantsService.toGeoJson(restaurant.location)
     }
   }
   mapDocumentFromGeoJson<T extends { location: GeoPoint }>(restaurant: T) {
     return {
       ...restaurant,
-      location: this.fromGeoJson(restaurant.location)
+      location: RestaurantsService.fromGeoJson(restaurant.location)
     }
   }
-  fromGeoJson(location: { type: "Point", coordinates: [number, number] }) {
+  static fromGeoJson(location: { type: "Point", coordinates: [number, number] }) {
 
     return {
       longitude: location.coordinates[0],
       latitude: location.coordinates[1],
     }
   }
-  toGeoJson(location: Location) {
+  static toGeoJson(location: Location) {
     return {
       type: "Point" as const,
       coordinates: [location.longitude, location.latitude] as [number, number]

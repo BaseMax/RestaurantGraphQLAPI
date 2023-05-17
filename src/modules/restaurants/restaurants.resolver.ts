@@ -23,10 +23,11 @@ import { RestaurantsService } from './restaurants.service';
 
 @Resolver(() => Restaurant)
 export class RestaurantsResolver {
-  constructor(private service: RestaurantsService) {}
+  constructor(private service: RestaurantsService) { }
 
   @Query(() => [Restaurant])
   async restaurants(@Args('query') query: SearchRestaurantsInput) {
+    return this.service.search(query);
     // todo: complete
   }
   @Query(() => Restaurant)

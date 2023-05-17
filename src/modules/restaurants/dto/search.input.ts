@@ -1,5 +1,5 @@
 import { Field, InputType } from '@nestjs/graphql';
-import { Max, Min } from 'class-validator';
+import { IsOptional, Max, Min } from 'class-validator';
 import { Pagination } from 'src/utils/pagination.input';
 
 @InputType()
@@ -33,10 +33,12 @@ export class SearchRestaurantsInput extends Pagination {
   @Field({ nullable: true })
   city?: string;
 
+  @IsOptional()
   @Min(0)
   @Field({ nullable: true })
   minPrice?: number;
 
+  @IsOptional()
   @Min(0)
   @Field({ nullable: true })
   maxPrice?: number;
