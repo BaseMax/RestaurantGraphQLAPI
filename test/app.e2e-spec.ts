@@ -275,7 +275,6 @@ describe('AppController (e2e)', () => {
         .post('/graphql')
         .send({ query: registerMutation, variables });
 
-      console.log(response.body);
       // Assert the response
       expect(response.status).toBe(200);
       expect(response.body.errors).toBeFalsy();
@@ -307,7 +306,7 @@ describe('AppController (e2e)', () => {
         input: {
           email: usersData[0].email,
           name: 'New User',
-          password:'Test123!',
+          password: 'Test123!',
         },
       };
 
@@ -327,5 +326,102 @@ describe('AppController (e2e)', () => {
       expect(newUser).toBeFalsy();
     });
   });
+
+  describe('Registration and Login', () => {
+    it('should register a new user and then log in with the credentials', async () => {
+      // Define the mutation payload for registration
+      const registerMutation = `
+        mutation Register($input: RegisterUserInput!) {
+          register(input: $input) {
+            user {
+              id
+              name
+            }
+            token
+          }
+        }
+      `;
+      const variables = {
+        input: {
+          email: 'newuser@example.com',
+          name: 'New User',
+          password: 'StrongPassword1!',
+        },
+      };
+
+      // Send the registration mutation request and check the response
+      const registerResponse = await request(app.getHttpServer())
+        .post('/graphql')
+        .send({ query: registerMutation, variables });
+
+      // Assert the response
+      expect(registerResponse.status).toBe(200);
+      expect(registerResponse.body.errors).toBeFalsy();
+      expect(registerResponse.body.data.register.user.name).toBe('New User');
+      expect(registerResponse.body.data.register.token).toBeTruthy();
+
+      // Define the mutation payload for login
+      const loginMutation = `
+        mutation Login($input: LoginUserInput!) {
+          login(input: $input) {
+            user {
+              id
+              name
+            }
+            token
+          }
+        }
+      `;
+      const loginVariables = {
+        input: {
+          email: 'newuser@example.com',
+          password: 'StrongPassword1!',
+        },
+      };
+
+      // Send the login mutation request and check the response
+      const loginResponse = await request(app.getHttpServer())
+        .post('/graphql')
+        .send({ query: loginMutation, variables: loginVariables });
+
+      // Assert the response
+      expect(loginResponse.status).toBe(200);
+      expect(loginResponse.body.errors).toBeFalsy();
+      expect(loginResponse.body.data.login.user.name).toBe('New User');
+      expect(loginResponse.body.data.login.token).toBeTruthy();
+    });
+
+    it('should return an error if the password is not strong enough', async () => {
+      // Define the mutation payload for registration with a weak password
+      const registerMutation = `
+        mutation Register($input: RegisterUserInput!) {
+          register(input: $input) {
+            user {
+              id
+              name
+            }
+            token
+          }
+        }
+      `;
+      const variables = {
+        input: {
+          email: 'newuser@example.com',
+          name: 'New User',
+          password: 'weakpassword',
+        },
+      };
+
+      // Send the registration mutation request and check the response
+      const response = await request(app.getHttpServer())
+        .post('/graphql')
+        .send({ query: registerMutation, variables });
+
+      // Assert the response
+      expect(response.status).toBe(200);
+      expect(response.body.errors[0].extensions.code).toBe('BAD_REQUEST');
+    });
+  });
+
 });
 
