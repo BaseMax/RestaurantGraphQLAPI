@@ -18,7 +18,7 @@ export class UsersService {
   getAll(): Promise<User[]> {
     return this.collection.find().toArray().then(e => e.map(mapOID));
   }
-  async changeRole(user: UserAuth, role: Role, id: string): Promise<User> {
+  async changeRole( role: Role, id: string): Promise<User> {
     const userExists = await this.getUserById(id);
     if (!userExists)
       throw new NotFoundException("user not found");

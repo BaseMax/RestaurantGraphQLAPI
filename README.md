@@ -45,6 +45,11 @@ Run `npm install` to install Node dependencies:
 ```
 npm install
 ```
+### Create admin account  
+```
+npx nest start --entryFile create-admin.js
+```
+and it will ask you for email password and name and it will create a superuser account 
 
 ### Run in development
 Run the app using Docker Compose:

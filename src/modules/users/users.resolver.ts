@@ -13,12 +13,10 @@ export class UsersResolver {
   @UseGuards(AuthGuard)
   @Mutation(() => User)
   async changeRole(
-    @UserData() user: UserAuth,
     @Args('newRole', { type: () => Role }) role: Role,
     @Args('userId', { type: () => String }) id: string,
-
   ) {
-    return await this.service.changeRole(user, role, id);
+    return await this.service.changeRole(role, id);
   }
   @MinRole(Role.superadmin)
   @UseGuards(AuthGuard)
