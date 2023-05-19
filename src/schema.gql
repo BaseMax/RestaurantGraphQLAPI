@@ -70,6 +70,7 @@ type Review {
 }
 
 type Query {
+  getAllUsers: [User!]!
   user: User!
   restaurants(query: SearchRestaurantsInput!): [Restaurant!]!
   restaurant(id: ID!): Restaurant!
@@ -101,6 +102,7 @@ input Pagination {
 }
 
 type Mutation {
+  changeRole(newRole: Role!, userId: String!): User!
   register(input: RegisterUserInput!): AuthPayload!
   login(input: LoginUserInput!): AuthPayload!
   createRestaurant(input: CreateRestaurantInput!): Restaurant!
@@ -110,6 +112,12 @@ type Mutation {
   updateFood(input: UpdateFoodInput!): Food!
   deleteFood(id: String!): Boolean!
   createReview(input: CreateReviewInput!): Review!
+}
+
+enum Role {
+  user
+  admin
+  superadmin
 }
 
 input RegisterUserInput {

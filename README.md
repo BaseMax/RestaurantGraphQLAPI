@@ -1,52 +1,276 @@
 # RestaurantGraphQL API
-
-The RestaurantGraphQL API is a GraphQL-based API designed to handle multiple restaurants in a shop store. It provides various features such as searching for restaurants in a city, finding the nearest restaurant, retrieving a list of foods offered by a restaurant, and more. This README file provides an overview of the API and instructions on how to use it.
+This API uses GraphQL to expose details about restaurants and their menus. It allows users to search for restaurants, view food items and reviews, and (for admins) manage restaurant and food data.  
 
 ## Features
+- Search restaurants by city, cuisine, name, price range, and proximity
+- View restaurant details: name, address, contact info, opening hours
+- Calculate distance to a restaurant
+- Get food menu items: name, description, price
+- Create, update and delete menu items (for admins)
+- View customer reviews 
+- Create reviews (for authenticated users)   
+- Manage users and assign roles (for superadmins)
 
-The RestaurantGraphQL API offers the following features:
+## Queries
+- `restaurants` - Search and filter restaurants
+- `restaurant` - Get a specific restaurant
+- `food` - Get a food item        
+- `foods` - Get all menu items for a restaurant
+- `reviews` - Get reviews for a restaurant
+- `user` - Get the authenticated user   
 
-- Search in a city: Users can search for restaurants in a specific city by providing the city name as a parameter.
-- Distance calculation: The API can calculate the distance between a given location and all the restaurants, enabling users to find the nearest restaurant.
-- Retrieve restaurant details: Users can retrieve detailed information about a specific restaurant, including its name, address, contact details, opening hours, and more.
-- Get a list of foods: The API allows users to fetch a list of foods offered by a restaurant, including their names, descriptions, prices, and any other relevant details.
-- Filtering: Users can apply various filters while searching for restaurants, such as cuisine type, price range, ratings, and more.
+## Mutations
+- `createRestaurant`    
+- `updateRestaurant`
+- `deleteRestaurant`  
+- `createFood`
+- `updateFood`    
+- `deleteFood`
+- `createReview`       
+- `changeRole`  
+# Usage 
 
-## Installation
+## Usage
 
-To run the RestaurantGraphQL API locally, follow these steps:
+### Clone the repo
+Clone this repository to get the source code:
 
-Clone the repository:
-
-```bash
-git clone https://github.com/BaseMax/RestaurantGraphQL
+```
+git clone https://github.com/basemax/RestaurantGraphqlApi
 ```
 
-Navigate to the project directory:
+### Install dependencies
+Run `npm install` to install Node dependencies:
 
-```bash
-cd RestaurantGraphQL
 ```
-
-Install the dependencies:
-
-```bash
 npm install
 ```
 
-Set up the environment variables:
+### Run in development
+Run the app using Docker Compose:
 
-- Create a `.env` file in the project root.
-- Define the necessary environment variables, such as the database connection details and API keys.
+```
+sudo docker-compose -f docker-compose.dev.yml up
+``` 
 
-Start the server:
+This will start the app in development mode, with hot reloading enabled.
 
-```bash
-npm start
+The GraphQL playground will be available at `http://localhost:3000/graphql`
+
+
+# Examples 
+Queries:
+
+1. Get all restaurants:
+```graphql
+{
+  restaurants {
+    name
+    location {
+      latitude
+      longitude
+    }  
+  }
+}
 ```
 
-The API will be available at http://localhost:3000.
+2. Get a specific restaurant by ID:
+```graphql 
+{
+  restaurant(id: "1") {
+    name
+    cuisine
+    openingHours {
+      day
+      hours  
+    }
+  }
+}
+```
 
+3. Get foods for a restaurant:
+```graphql
+{
+  foods(restaurantId: "1") {
+    name
+    description
+    price
+  }
+}
+```
+
+4. Get reviews for a restaurant:
+```graphql
+{
+  reviews(restaurantId: "1") {
+    rating
+    comment   
+  }
+}
+}
+```
+
+5. Search restaurants by city:
+```graphql
+{
+  restaurants(query: {
+    city: "Paris"
+  }) {
+   name  
+  }
+}
+```
+
+Mutations:
+
+6. Create a new restaurant: 
+```graphql
+mutation {
+  createRestaurant(input: {
+    name: "La Table"
+    location: {
+      longitude: 2.3456
+      latitude: 48.8534
+    }  
+  }) {
+    id
+  }  
+}
+```
+
+7. Update a restaurant:
+```graphql
+mutation {
+  updateRestaurant(input: {
+    id: "1"
+    name: "New Restaurant Name"
+  }) {
+    name  
+  }
+}
+```
+
+8. Create a new food item:
+```graphql
+mutation {
+  createFood(input: {
+    name: "Steak Frites"    
+    price: 20
+    restaurantId: "1"
+  }) {
+    id   
+  }
+}
+```
+
+9. Create a new review:
+```graphql
+mutation {
+  createReview(input: {  
+    restaurantId: "1"   
+    rating: 5
+    comment: "Great food and service!"
+  }) {
+    id  
+  }
+}
+```
+
+10. Change a user's role:
+```graphql
+mutation {
+  changeRole(newRole: admin, userId: "2") {
+    role   
+  }  
+}
+```
+
+Hope this helps! Let me know if you have any other questions.
+# API Documentation
+
+This API uses GraphQL to provide data about restaurants and their menus.
+
+## Queries
+
+### Restaurant queries
+
+- `restaurants(query: SearchRestaurantsInput)` - Returns all restaurants matching the search parameters. You can search by:
+  - `name`
+  - `city`
+  - `cuisine`
+  - `minPrice` 
+  - `maxPrice`
+  - `nearBy { radius, latitude, longitude }`
+
+- `restaurant(id: ID!)` - Returns a single restaurant object by ID.
+
+- `distance(location: LocationInput!)` - Returns the distance between a given location and the restaurant.
+
+### Food menu queries
+
+- `food(id: ID!)` - Returns a single food item by ID.
+
+- `foods(restaurantId: ID!, pagination: Pagination)` - Returns all food items for a restaurant, with pagination. Pagination parameters are:
+  - `limit` 
+  - `skip`
+
+### Review queries
+
+- `reviews(restaurantId: ID!, pagination: Pagination)` - Returns all reviews for a restaurant, paginated.
+
+- `user` - Returns the current authenticated user object.
+
+## Mutations
+
+### Restaurant mutations
+
+- `createRestaurant(input: CreateRestaurantInput!)` - Creates a new restaurant. Input fields are:
+  - `name`
+  - `location { latitude, longitude }`
+  - `address`
+  - `rating`  
+  - `cuisine`   
+  - `contact { email, phone }`
+  - `openingHours [ { day, hours } ]`
+
+- `updateRestaurant(input: UpdateRestaurantInput!)` - Updates an existing restaurant. Requires the `id` field.
+
+- `deleteRestaurant(id: String!)` - Requires admin role.
+
+### Food menu mutations
+
+- `createFood(input: CreateFoodInput!)` - Requires admin role. Input fields are:
+  - `name`
+  - `description`
+  - `price`  
+  - `restaurantId`
+
+- `updateFood(input: UpdateFoodInput!)` - Requires admin role. 
+
+- `deleteFood(id: String!)` - Requires admin role.
+
+### Review mutations
+
+- `createReview(input: CreateReviewInput!)` - Requires authentication. Input fields are:
+  - `restaurantId`  
+  - `rating`
+  - `comment`
+
+### User mutations
+
+- `changeRole(newRole: Role!, userId: String!)` - Requires superadmin role. Changes a user's role.
+
+Let me know if you have any other questions about the API! I can expand on any part in more detail.
+## Security
+Roles:  
+
+- `user` - Basic access  
+- `admin` - Manage restaurants and menu    
+- `superadmin` - Manage all users and roles
+
+Authentication uses JWT tokens.
+
+Let me know if you have any other questions!
 ## Usage
 
 To interact with the RestaurantGraphQL API, you need a GraphQL client or an API testing tool. Here's an example using cURL:
