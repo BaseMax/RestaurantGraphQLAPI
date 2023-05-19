@@ -78,7 +78,8 @@ The GraphQL playground will be available at `http://localhost:3000/graphql`
 Here are some examples of queries and mutations that can be executed using the RestaurantGraphQL API:
 
 ### Query for restaurants in a specific city
-```
+
+```graphql
 query {
   restaurants(query: {city: "New York"}) {
     id
@@ -95,7 +96,8 @@ query {
 ```
 
 ### Query for a specific restaurant and its details
-```
+
+```graphql
 query {
   restaurant(id: "12345") {
     id
@@ -120,7 +122,8 @@ query {
 ```
 
 ### Query for a list of foods offered by a restaurant
-```
+
+```graphql
 query {
   foods(restaurantId: "12345", pagination: {limit: 10, skip: 0}) {
     id
@@ -132,7 +135,8 @@ query {
 ```
 
 ### Mutation to create a new restaurant
-```
+
+```graphql
 mutation {
   createRestaurant(input: {
     name: "New Restaurant",
@@ -165,7 +169,8 @@ mutation {
 ```
 
 ### Mutation to update an existing restaurant
-```
+
+```graphql
 mutation {
   updateRestaurant(input: {
     id: "12345",
@@ -180,7 +185,8 @@ mutation {
 ```
 
 ### Mutation to delete a food item
-```
+
+```graphql
 mutation {
   deleteFood(id: "12345")
 }
@@ -270,7 +276,6 @@ Roles:
 
 Authentication uses JWT tokens.
 
-Let me know if you have any other questions!
 ## Contributing
 
 If you encounter any issues or have suggestions for improvements, please submit an issue or a pull request to the GitHub repository.
@@ -278,3 +283,5 @@ If you encounter any issues or have suggestions for improvements, please submit 
 ## License
 
 The RestaurantGraphQL API is open-source and released under the GPL-V3.0 License. Feel free to use, modify, and distribute the code as per the terms of the license.
+
+Copyright 2023, Max Base
