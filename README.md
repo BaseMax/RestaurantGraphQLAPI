@@ -12,7 +12,16 @@ The RestaurantGraphQL API offers the following features:
 - Get a list of foods: The API allows users to fetch a list of foods offered by a restaurant, including their names, descriptions, prices, and any other relevant details.
 - Filtering: Users can apply various filters while searching for restaurants, such as cuisine type, price range, ratings, and more.
 
+## GraphQL Demo
+
+![image](https://github.com/BaseMax/RestaurantGraphQLAPI/assets/2658040/a5d4abd8-0149-4b9e-9c8f-8e3085fcd713)
+
+![image](https://github.com/BaseMax/RestaurantGraphQLAPI/assets/2658040/f14479f4-5374-4429-9900-62dc04a0b5f0)
+
+![image](https://github.com/BaseMax/RestaurantGraphQLAPI/assets/2658040/d603670d-6bd8-4e17-a0f9-57c0adf43593)
+
 ## Available Queries
+
 The following queries are available in the API:
 
 - `restaurants(query: SearchRestaurantsInput!)`: Returns a list of restaurants based on the provided search query.
@@ -24,6 +33,7 @@ The following queries are available in the API:
 - `getAllUsers`: Returns a list of all users (requires superadmin role).
 
 ## Available Mutations
+
 The following mutations are available in the API:
 
 - `register(input: RegisterUserInput!)`: Registers a new user with the provided information.
